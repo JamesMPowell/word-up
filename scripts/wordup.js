@@ -130,9 +130,9 @@ function render() {
     $("#allowed-letters").empty();
     $("#word-submissions").empty();
     // TODO 10
-    // Add a few things to the above code block (underneath "// clear stuff").
-
-
+    // Add a few things to the above code block (underneath "// clear stuff").DONE
+    $("#text-box").removeClass("#bad-attempt").attr("disabled",false);
+    $("#disallowed-letter").remove();
     // reveal the #game container
     $("#game").show();
 
@@ -141,13 +141,13 @@ function render() {
     $("#allowed-letters").append(letterChips);
 
     // TODO 11
-    // Render the word submissions
-
+    // Render the word submissions DONE
+    $("word-submissions").append(model.wordSubmissions.map(wordSubmissionChip));
 
     // Set the value of the textbox
     $("#textbox").val(model.currentAttempt).focus();
     // TODO 3
-    // Give focus to the textbox.
+    // Give focus to the textbox. DONE
 
 
     // if the current word attempt contains disallowed letters,
@@ -161,7 +161,7 @@ function render() {
 
         // TODO 8
         // append the red letter chips to the form
-
+        $("#word-attempt-form").append(redLetterChips);
     }
 
     // if the game is over
@@ -169,6 +169,7 @@ function render() {
     if (gameOver) {
         // TODO 9
         // disable the text box and clear its contents
+        $("#textbox").val("").attr("disabled",true);
 
     }
 }
@@ -242,8 +243,11 @@ $(document).ready(function() {
     // TODO 6
     // Add another event handler with a callback function.
     // When the textbox content changes,
-    // update the .currentAttempt property of the model and re-render
-
+    // update the .currentAttempt property of the model and re-render DONE
+    $("#textbox").on("input",function(){
+        model.currentAttempt = $("#textbox").val();
+        render()
+    });
 
     // when the form is submitted
     $("#word-attempt-form").submit(function(evt) {
@@ -280,8 +284,8 @@ var scrabblePointsForEachLetter = {
 function isDisallowedLetter(letter) {
     // TODO 7
     // This should return true if the letter is not an element of
-    // the .allowedLetters list in the model
-    return false;
+    // the .allowedLetters list in the model DONE
+    return model.allowedLetters.indexOf(letter);
 }
 
 /**
