@@ -53,8 +53,9 @@ function addNewWordSubmission(word) {
     // Do we already have a wordSubmission with this word?
     // TODO 21
     // replace the hardcoded 'false' with the real answer
-    var alreadyUsed = false;
-
+    model.wordSubmissions.filter(function(submission) {
+        return submission.word == word
+    }).length > 0;
     // if the word is valid and hasn't already been used, add it
     if (containsOnlyAllowedLetters(word) && alreadyUsed == false) {
         model.wordSubmissions.push({ word: word });
@@ -73,8 +74,8 @@ function checkIfWordIsReal(word) {
 
     // make an AJAX call to the Pearson API
     $.ajax({
-        // TODO 13 what should the url be?
-        url: "www.todo13.com",
+        // TODO 13 what should the url be?DONE
+        url: "http://api.pearson.com/v2/dictionaries/entries",
         success: function(response) {
             console.log("We received a response from Pearson!");
 
@@ -85,11 +86,15 @@ function checkIfWordIsReal(word) {
             // Replace the 'true' below.
             // If the response contains any results, then the word is legitimate.
             // Otherwise, it is not.
-            var theAnswer = true;
-
+            var theAnswer = response.results.length>0;
             // TODO 15
             // Update the corresponding wordSubmission in the model
-
+            model.wordSubmissions.forEach(
+                function(submission){
+                    if(submission.word===word){
+                        submission.isRealWord=theAnswer
+                    }
+                });
 
             // re-render
             render();
@@ -160,7 +165,7 @@ function render() {
         var redLetterChips = disallowedLetters.map(disallowedLetterChip);
 
         // TODO 8
-        // append the red letter chips to the form
+        // append the red letter chips to the form DONE
         $("#word-attempt-form").append(redLetterChips);
     }
 
@@ -168,7 +173,7 @@ function render() {
     var gameOver = model.secondsRemaining <= 0
     if (gameOver) {
         // TODO 9
-        // disable the text box and clear its contents
+        // disable the text box and clear its contents DONE
         $("#textbox").val("").attr("disabled",true);
 
     }
@@ -204,19 +209,19 @@ function wordSubmissionChip(wordSubmission) {
 
     // if we know the status of this word (real word or not), then add a green score or red X
     if (wordSubmission.hasOwnProperty("isRealWord")) {
-        var scoreChip = $("<span></span>").text("⟐");
+        var scoreChip = $("<span></span>");
         // TODO 17
         // give the scoreChip appropriate text content
-
+        scoreChip.text(wordSubmission.isRealWord ? wordScore(wordSubmission.word):"X");
         // TODO 18
         // give the scoreChip appropriate css classes
-
+        scoreChip.attr("class","tag tag-sm").addClass(wordSubmission.isRealWord ? "tag-primary":"tag-danger");
         // TODO 16
         // append scoreChip into wordChip
-
+        wordChip.append(scoreChip)
     }
-
-    return wordChip;
+        return wordChip
+        //
 }
 
 /**
@@ -275,7 +280,7 @@ $(document).ready(function() {
 var scrabblePointsForEachLetter = {
     a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1, m: 3,
     n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10
-}
+};
 
 /**
  * Given a letter, checks whether that letter is "disallowed"
@@ -285,7 +290,7 @@ function isDisallowedLetter(letter) {
     // TODO 7
     // This should return true if the letter is not an element of
     // the .allowedLetters list in the model DONE
-    return model.allowedLetters.indexOf(letter);
+    return model.allowedLetters.indexOf(letter)== -1
 }
 
 /**
@@ -303,8 +308,8 @@ function disallowedLettersInWord(word) {
  */
 function containsOnlyAllowedLetters(word) {
     // TODO 12
-    // Return the actual answer.
-    return true;
+    // Return the actual answer.DONE
+    return disallowedLettersInWord(word).length == 0
 }
 
 /**
@@ -335,7 +340,7 @@ function wordScore(word) {
     // TODO 19
     // Replace the empty list below.
     // Map the list of letters into a list of scores, one for each letter.
-    var letterScores = [];
+    var letterScores=letters.map(letterScore);
 
     // return the total sum of the letter scores
     return letterScores.reduce(add, 0);
@@ -358,8 +363,8 @@ function currentScore() {
     });
 
     // TODO 20
-    // return the total sum of the word scores
-    return 0;
+    // return the total sum of the word scores DONE
+    return wordScores.reduce(add,0)
 }
 
 
